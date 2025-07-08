@@ -1,0 +1,22 @@
+{% extends "store/base.html" %}
+{% block title %}
+    {{ product.label }}
+{% endblock title %}
+{% block content %}
+    <h1>{{ product.label }}</h1><br>
+    <h1>R{{ product.price }}</h1><br>
+    <h1>{{ product.seller }}</h1>
+    <div class="navbutton">
+        <a href="{% url 'store:add_review' pk=product.pk %}">ADD Review</a>
+    </div>
+    <form action="{% url 'store:add_to_cart' pk=product.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Add to Cart</button>
+    </form>
+    {% for review in review_list %}
+        <h3>Title</h3><br>
+        {{ review.title }}<br>
+        <h3>Content</h3><br>
+        {{ review.content }}
+    {% endfor %}
+{% endblock content %}

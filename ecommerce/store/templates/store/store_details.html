@@ -1,0 +1,20 @@
+{% extends "store/base.html" %}
+{% block title %}
+    {{ store.name }}
+{% endblock title %}
+{% block content %}
+    <h1>{{ store.name }}</h1>
+    <div class="navbutton">
+        <a href="{% url 'store:add_product' pk=store.pk %}">ADD PRODUCT</a>
+    </div>
+    <div>
+        {% for product in filtered_products %}
+            <h2>Product</h2><br>
+            <a href="{% url 'store:product_details' pk=product.pk %}">{{ product.label }}</a><br>
+            <h2>Price</h2>
+            R{{ product.price }}<br>
+            <a href="{% url 'store:edit_product' pk=product.pk %}">edit</a>
+            <a href="{% url 'store:delete_product' pk=product.pk %}">DELETE</a>
+        {% endfor %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends "store/base.html" %}
+{% block title %}
+    Cart
+{% endblock %}
+{% block content %}
+    This is the cart
+    <table> 
+        <tr> 
+            <th>Product name</th> 
+            <th>Price</th> 
+        </tr> 
+        {% for product in cart %} 
+        <tr> 
+            <td>{{ product.label }}</td> 
+            <td>{{ product.price }}</td> 
+        </tr> 
+        {% endfor %} 
+    </table>
+     <form action="{% url 'store:send_invoice' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">purchease</button>
+    </form>
+{% endblock content %}

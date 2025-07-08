@@ -1,0 +1,14 @@
+{% extends "store/base.html" %}
+{% block title %}
+    Send Reset Password
+{% endblock title %}
+{% block content %}
+    <h1>Send Reset Password</h1>
+<form action="store:send_reset" method="post">
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email"><br><br>
+
+  <button type="submit">Submit</button>
+</form>
+{% endblock content %}

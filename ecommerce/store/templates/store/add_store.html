@@ -1,0 +1,12 @@
+{% extends "store/base.html" %}
+{% block title %}
+    ADD STORE
+{% endblock title %}
+{% block content %}
+    <h1>ADD A STORE</h1>
+    <form method="POST">
+        {% csrf_token %}
+            {{ form.as_p }}
+        <button type="submit" class="btn">Add Store</button>
+    </form>
+{% endblock content %}

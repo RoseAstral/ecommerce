@@ -1,0 +1,17 @@
+{% extends "store/base.html" %}
+{% block title %}
+    FrontPage
+{% endblock %}
+{% block content %}
+    This is the frontpage
+    {% for store in store_list %}
+        <li>
+            <p>
+                <a href="{% url 'store:store_details' pk=store.pk %}">{{ store.name }}</a>
+            </p>
+            <a href="{% url 'store:edit_store' pk=store.pk %}">edit</a>
+            <a href="{% url 'store:delete_store' pk=store.pk %}">DELETE</a>
+        </li>
+    {% endfor %}
+    {{ cart_products }}
+{% endblock content %}
