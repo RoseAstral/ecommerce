@@ -4,11 +4,14 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from .models import Store, Product, Review, RestToken
+from .models import Store, Product, Review, RestToken, StoreSerializer, ProductSerializer, ReviewSerializer
 from django.core.mail import EmailMessage
 from datetime import datetime, timedelta
 import secrets
 from hashlib import sha1
+from rest_framework.decorators import api_view
+import requests
+from .twitter import Tweet
 
 Vendors, created = Group.objects.get_or_create(name='Vendors')
 Buyers, created = Group.objects.get_or_create(name='Buyers')
@@ -83,6 +86,9 @@ def add_store_view(request):
                 store = form.save(commit=False)
                 store.owner = request.user
                 store.save()
+                new_tweet = f'New store has been add.\n{store.name}.'
+                tweet = {'text': new_tweet}
+                Tweet._instance.make_tweet(tweet)
                 return redirect("store:frontpage")
         else:
             form = StoreForm()
@@ -126,6 +132,9 @@ def add_product_view(request, pk):
                 product.store = Store.objects.get(pk=pk)
                 product.seller = request.user
                 product.save()
+                new_product_tweet = f'New product has been add.\n{product.label}\nOn{product.store.name}.'
+                tweet = {'text': new_product_tweet}
+                Tweet._instance.make_tweet(tweet)
                 return redirect("store:frontpage")
         else:
             form = ProductForm()
@@ -279,3 +288,49 @@ def change_user_password(username, new_password):
     user = User.objects.get(username=username)
     user.set_password(new_password)
     user.save()
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def add_store_api_view(request): 
+    if request.method == "POST":
+        serializer = StoreSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            new_tweet = f'New store has been add.\n{serializer.name}.'
+            tweet = {'text': new_tweet}
+            Tweet._instance.make_tweet(tweet)
+            return JsonResponse(data=serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def view_store_api_view(request):
+    if request.method == "GET":
+        serializer = StoreSerializer(Store.objects.all(), many=True)
+        return JsonResponse(data=serializer.data, safe=False)
+    
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def add_product_api_view(request): 
+    if request.method == "POST":
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            new_tweet = f'New product has been add.\n{serializer.name}\nOn{serializer.store.name}.'
+            tweet = {'text': new_tweet}
+            Tweet._instance.make_tweet(tweet)
+            serializer.save()
+            return JsonResponse(data=serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def view_product_api_view(request):
+    if request.method == "GET":
+        serializer = ProductSerializer(Product.objects.all(), many=True)
+        return JsonResponse(data=serializer.data, safe=False)
+    
+@api_view(['GET'])
+def view_review_api_view(request):
+    if request.method == "GET":
+        serializer = ReviewSerializer(Review.objects.all(), many=True)
+        return JsonResponse(data=serializer.data, safe=False)

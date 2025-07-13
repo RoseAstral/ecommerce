@@ -19,10 +19,25 @@ from .views import  (
     send_invoice,
     reset_user_password,
     send_password_reset,
+    add_product_api_view,
+    view_product_api_view,
+    add_store_api_view,
+    view_store_api_view,
+    view_review_api_view
 )
 
 app_name = "store"
 urlpatterns = [
+    path('review_get_api/', view_review_api_view, name='view_review_api'),
+
+    path('add_store_api/', add_store_api_view, name='add_store_api'),
+
+    path('add_product_api/', add_product_api_view, name='add_product_api'),
+
+    path('product_details_api/', view_product_api_view, name='view_product_api'),
+
+    path('store_details_api/', view_store_api_view, name='view_store_api'),
+
     path('send_password_resest', send_password_reset, name='send_reset'),
 
     path('send_invoice/', send_invoice, name="send_invoice"),
